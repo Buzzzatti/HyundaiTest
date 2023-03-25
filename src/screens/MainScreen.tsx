@@ -34,11 +34,9 @@ export const MainScreen: FunctionComponent<IMainScreenProps> = () => {
   const [counter, setCounter] = useState(30);
   const [page, setPage] = useState(1);
   const isFocused = useIsFocused();
-  console.log('page', page);
-  console.log('isFocused', isFocused);
 
   const request = async () => {
-    // dispatch(fetchEvets({page: page, per_page: 25}));
+    dispatch(fetchEvets({page: page, per_page: 25}));
   };
 
   useEffect(() => {
