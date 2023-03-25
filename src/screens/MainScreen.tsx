@@ -40,9 +40,10 @@ export const MainScreen: FunctionComponent<IMainScreenProps> = () => {
   };
 
   useEffect(() => {
+    const timer = setTimeout(() => setCounter(counter - 1), 1000);
     if (isFocused && page > 0) {
       if (counter > 0) {
-        setTimeout(() => setCounter(counter - 1), 1000);
+        timer;
       } else {
         setPage(page + 1);
         request().then(() => {
@@ -50,6 +51,7 @@ export const MainScreen: FunctionComponent<IMainScreenProps> = () => {
         });
       }
     }
+    return () => clearTimeout(timer);
   }, [counter, page]);
 
   useEffect(() => {
