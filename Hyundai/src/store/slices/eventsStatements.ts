@@ -23,6 +23,7 @@ export interface IEvent {
   };
   payload: {
     action: string;
+    commits: [];
   };
   public: boolean;
   created_at: string;
@@ -55,12 +56,12 @@ const eventsStatementsSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder
-      // STATE
       .addCase(fetchEvets.pending, state => {
         state.isEventsLoading = true;
       })
-      .addCase(fetchEvets.fulfilled, state => {
+      .addCase(fetchEvets.fulfilled, (state, {payload}) => {
         state.isEventsLoading = false;
+        state.events = payload;
       })
       .addCase(fetchEvets.rejected, state => {
         state.isEventsLoading = false;

@@ -14,13 +14,11 @@ import {rootStore} from './src/store/rootStore';
 
 function App(): JSX.Element {
   return (
-    // <ApplicationProvider {...eva} theme={{...eva.light, ...theme}}>
     <Provider store={rootStore}>
       <NavigationContainer>
         <AppNavigator />
       </NavigationContainer>
     </Provider>
-    // </ApplicationProvider>
   );
 }
 

@@ -1,21 +1,15 @@
 import {defaultApi} from '..';
+import {IEvent} from '../../store/slices/eventsStatements';
 import {IEventsResponse} from '../../types/api/events';
 import {requestPaths} from '../RequestsPaths';
 
-export async function getEvents(params: IEventsResponse): Promise<any> {
+export async function getEvents(params: IEventsResponse): Promise<IEvent[]> {
   try {
-    console.log('params', params);
-
     const {data} = await defaultApi.get(
-      // `${requestPaths.events}?per_page=${params.per_page}&page=${params.page}`,
-      `${requestPaths.events}`,
+      `${requestPaths.events}?per_page=${params.per_page}&page=${params.page}`,
     );
-    console.log('data', data);
-
     return data;
   } catch (err: any) {
-    console.log('err', err);
-
     throw err;
   }
 }

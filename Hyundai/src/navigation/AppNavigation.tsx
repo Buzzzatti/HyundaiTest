@@ -2,23 +2,21 @@ import React from 'react';
 
 import {MainTabsNavigation} from './MainTabsNavigation';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-// import {ChatScreen} from '~screens/additionally/chat/ChatScreen';
-// import CardHistoryScreen from '~screens/HistoryScreen/cardHistory';
 import AdditionalScreen from '../screens/AdditionalScreen';
 import {MainScreen} from '../screens/MainScreen';
 const MainStack = createNativeStackNavigator();
 
 const AdditionalStack = createNativeStackNavigator();
 
-export const PaymentStackScreen = () => (
+export const AdditionalStackScreen = () => (
   <AdditionalStack.Navigator
-    initialRouteName="PaymentStackScreen"
+    initialRouteName="AdditionalStackScreen"
     screenOptions={{
       contentStyle: {backgroundColor: '#fff'},
       headerShown: false,
     }}>
     <AdditionalStack.Screen
-      name="PaymentScreen"
+      name="AdditionalScreen"
       component={AdditionalScreen}
       initialParams={{isGoBack: false}}
     />
@@ -45,9 +43,6 @@ const MainNavigator = () => (
       headerShown: false,
     }}>
     <AppStack.Screen name="Main" component={MainTabsNavigation} />
-    {/* <AppStack.Screen name="CardHistoryScreen" component={CardHistoryScreen} />/ */}
-
-    {/* <AppStack.Screen name="ChatScreen" component={ChatScreen} /> */}
   </AppStack.Navigator>
 );
 

@@ -1,16 +1,16 @@
 import React, {FunctionComponent, useEffect, useState} from 'react';
 import {
-  Pressable,
+  ActivityIndicator,
+  Image,
+  Linking,
   RefreshControl,
   SafeAreaView,
   ScrollView,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 
-// import {useDispatch, useSelector} from 'react-redux';
-// import {useIsFocused, useNavigation} from '@react-navigation/native';
-// import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {StyleService, useStyleSheet} from '@ui-kitten/components';
 import {useDispatch, useSelector} from 'react-redux';
 import {
@@ -18,57 +18,146 @@ import {
   fetchEvets,
   historyStatementsEvents,
 } from '../store/slices/eventsStatements';
-
-// import {
-//   accountsInfoSelector,
-// } from '~store/slices/accountInfoSlice ';
-// import {
-//   fetchCheckNotesState,
-//   notesStatesSelector,
-// } from '~store/slices/notifications';
+import {format} from 'date-fns';
+import {ru} from 'date-fns/locale';
+import {useIsFocused} from '@react-navigation/native';
 
 interface IMainScreenProps {}
 
-type RootStackParamList = {
-  DebitCards: undefined;
-  Notifications: object | undefined;
-};
-
 export const MainScreen: FunctionComponent<IMainScreenProps> = () => {
-  const styles = useStyleSheet(themedStyles);
-  // const [renderCounter, setRenderCounter] = useState(0);
-  // const accounts = useSelector(accountsInfoSelector);
-  // const isFocused = useIsFocused();
-
-  // const navigation =
-  //   useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
-  const dispatch = useDispatch();
-
-  const request = () => {
-    dispatch(fetchEvets({page: 1, per_page: 10}));
-  };
-
   const isLoading = useSelector(eventsStatementsIsLoading);
   const events = useSelector(historyStatementsEvents);
+  const dispatch = useDispatch();
 
+  const styles = useStyleSheet(themedStyles);
+
+  const [counter, setCounter] = useState(30);
+  const [page, setPage] = useState(1);
+  const isFocused = useIsFocused();
+  console.log('page', page);
+  console.log('isFocused', isFocused);
+
+  const request = async () => {
+    // dispatch(fetchEvets({page: page, per_page: 25}));
+  };
+
+  useEffect(() => {
+    if (isFocused && page > 0) {
+      if (counter > 0) {
+        setTimeout(() => setCounter(counter - 1), 1000);
+      } else {
+        setPage(page + 1);
+        request().then(() => {
+          setCounter(30);
+        });
+      }
+    }
+  }, [counter, page]);
+
+  useEffect(() => {
+    if (isFocused) {
+      setPage(page + 1);
+      request().then(() => {
+        setCounter(30);
+      });
+    }
+  }, [isFocused]);
+
+  const onRefresh = () => {
+    setPage(page + 1);
+    dispatch(fetchEvets({page: page, per_page: 25}))
+      .unwrap()
+      .then(() => {
+        setCounter(30);
+      });
+  };
+  console.log();
   return (
-    <SafeAreaView>
-      <View style={{height: '100%'}}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
         <ScrollView
+          showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl
-              onRefresh={() => console.log('lol')}
-              refreshing={false}
-            />
+            <RefreshControl onRefresh={() => onRefresh()} refreshing={false} />
           }>
-          <Text>Lol122{`${isLoading}`}</Text>
-          <Pressable onPress={() => request()}>
-            <View style={styles.name} />
-            {events.map(el => {
-              return <Text>{el?.actor}</Text>;
-            })}
-          </Pressable>
+          <View
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginBottom: 20,
+            }}>
+            <Text style={{fontSize: 20, marginBottom: 10}}>
+              До обновления данных осталось :{' '}
+            </Text>
+
+            {isLoading ? (
+              <ActivityIndicator size="large" color="#0082BA" />
+            ) : (
+              <Text style={{fontSize: 30}}>{counter} c.</Text>
+            )}
+          </View>
+          {!isLoading && events.length > 0 ? (
+            events?.map(el => {
+              return (
+                <View style={styles.user}>
+                  <View style={styles.top}>
+                    <Image
+                      style={styles.img}
+                      source={{
+                        uri: el.actor.avatar_url,
+                      }}
+                    />
+                    <View style={styles.nameContent}>
+                      <View style={styles.nameBlock}>
+                        <Text style={{color: '#000', fontSize: 20}}>
+                          Логин:
+                        </Text>
+                        <TouchableOpacity
+                          style={{marginLeft: 10}}
+                          onPress={() => Linking.openURL(el.actor.url)}>
+                          <Text style={{color: '#0082BA', fontSize: 16}}>
+                            {el.actor.login}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View style={styles.dateBlock}>
+                        <Text style={{color: '#000', fontSize: 20}}>
+                          Создан :
+                        </Text>
+                        <Text
+                          style={{marginLeft: 10, color: '#000', fontSize: 16}}>
+                          {format(new Date(el.created_at), 'd MMMM, yyyy', {
+                            locale: ru,
+                          })}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View style={styles.repoBlock}>
+                    <Text style={{color: '#000', fontSize: 20}}>
+                      Личный репозиторий :
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => Linking.openURL(el.repo.url)}>
+                      <Text style={{color: '#0082BA', fontSize: 20}}>
+                        {el.repo.url}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.commitsBlock}>
+                    <Text style={{color: '#000', fontSize: 20}}>
+                      Общее число коммитов :
+                      {el.payload.commits?.length > 0
+                        ? el.payload.commits?.length
+                        : 0}
+                    </Text>
+                  </View>
+                </View>
+              );
+            })
+          ) : (
+            <Text>Данных нет Возможно период доступак гиту закончился</Text>
+          )}
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -76,27 +165,61 @@ export const MainScreen: FunctionComponent<IMainScreenProps> = () => {
 };
 
 const themedStyles = StyleService.create({
-  header: {
+  container: {
+    backgroundColor: '#fff',
+  },
+  content: {height: '100%', paddingHorizontal: 20},
+  user: {
+    display: 'flex',
+    backgroundColor: '#F2F4F9',
+    flexDirection: 'column',
+    marginBottom: 20,
+    borderRadius: 20,
+    padding: 10,
+  },
+  top: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingRight: 24,
+    alignItems: 'center',
+  },
+  img: {width: 100, height: 100, borderRadius: 50},
+  nameContent: {
+    display: 'flex',
+    height: '100%',
+    paddingVertical: 20,
+    gap: 20,
+    marginLeft: 10,
+  },
+  nameBlock: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#8993A4',
+  },
+  dateBlock: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#8993A4',
+  },
+  repoBlock: {
+    display: 'flex',
+    flexDirection: 'column',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#8993A4',
+    marginBottom: 10,
+  },
+  commitsBlock: {
+    display: 'flex',
+    flexDirection: 'column',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#8993A4',
   },
   name: {
     height: 100,
     width: 100,
     backgroundColor: 'red',
-  },
-  screenWrapper: {
-    backgroundColor: 'primary-main-gray-0',
-    flex: 1,
-  },
-  storiesWrapper: {
-    marginHorizontal: -24,
-  },
-  screenContainer: {
-    paddingLeft: 24,
-    paddingRight: 12,
   },
 });

@@ -1,6 +1,6 @@
 import AdditionallyFilledIcon from '../components/Icons/tabs/AdditionallyFilledIcon';
 import MainFilledIcon from '../components/Icons/tabs/MainFilledIcon';
-import {MainStackScreen, PaymentStackScreen} from './AppNavigation';
+import {MainStackScreen, AdditionalStackScreen} from './AppNavigation';
 
 export const tabs = [
   {
@@ -12,7 +12,7 @@ export const tabs = [
   {
     id: 1,
     name: 'Еще',
-    component: PaymentStackScreen,
+    component: AdditionalStackScreen,
     icon: AdditionallyFilledIcon,
   },
 ];

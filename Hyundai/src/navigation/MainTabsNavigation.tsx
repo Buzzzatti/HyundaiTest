@@ -34,32 +34,10 @@ export const MainTabsNavigation = () => {
             key={tab.id}
             name={tab.name}
             component={tab.component}
-            options={({route}) => ({
-              tabBarStyle: (route => {
-                const routeName = getFocusedRouteNameFromRoute(route) ?? '';
-                if (routeName === 'PaymentSuccess') {
-                  return {
-                    display: 'flex',
-                    opacity: 0,
-                    // backgroundColor: 't',
-                    position: 'absolute',
-                    // left: 0,
-                    // right: 0,
-                    // top: 0,
-                    // bottom: -1,
-                    // height: 0,
-                  };
-                }
-                return {
-                  paddingBottom: 88,
-                  display: 'flex',
-                  alignItems: 'center',
-                  bottom: 0,
-                };
-              })(route),
+            options={{
               tabBarIcon: ({focused}) => <tab.icon isActive={focused} />,
               tabBarActiveTintColor: '#0082BA',
-            })}
+            }}
           />
         );
       })}
