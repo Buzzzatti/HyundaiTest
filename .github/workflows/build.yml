@@ -1,29 +1,21 @@
-name: react-native-android-build-apk
+name: Build Release APK
+
 on:
   push:
-    branches:
-      - main
+    branch:
+      - 'main'
+
 jobs:
-  install-and-test:
+  Gradle:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Install npm dependencies
-        run: |
-          npm install
-  build-android:
-    needs: install-and-test
-    runs-on: ubuntu-latest
-    steps: 
-      - uses: actions/checkout@v3
-      - name: Install npm dependencies
-        run: |
-          npm install
-      - name: Build Android Release
-        run: |
-          react-native run-android --variant=debug
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: app-release.apk
-          path: android/app/build/outputs/apk/release/
+    - name: checkout code
+      uses: actions/checkout@v2
+    - name: setup jdk
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Make Gradle executable
+      run: chmod +x ./android/gradlew
+    - name: Build Release APK
+      run: ./android/gradlew assembleRelease
