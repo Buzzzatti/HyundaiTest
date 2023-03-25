@@ -1,14 +1,29 @@
-on: [push]
+name: react-native-android-build-apk
+on:
+  push:
+    branches:
+      - main
 jobs:
-  react_native_ci_job:
+  install-and-test:
     runs-on: ubuntu-latest
-    name: React Native CI Build
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: React Native CI
-        uses: aslamanver/react-native-docker@v1
-      - name: Install NPM Dependencies
-        run: npm install
-      - name: Run NX Dev Android Build
-        run: npx nx build-android mobile
+      - uses: actions/checkout@v3
+      - name: Install npm dependencies
+        run: |
+          npm install
+  build-android:
+    needs: install-and-test
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v3
+      - name: Install npm dependencies
+        run: |
+          npm install
+      - name: Build Android Release
+        run: |
+          cd android && chmod +x ./gradlew && ./gradlew assembleRelease
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: app-release.apk
+          path: android/app/build/outputs/apk/release/
