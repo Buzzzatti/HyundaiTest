@@ -18,7 +18,7 @@ const AdditionalScreen: React.FC<IPaymentScreen> = () => {
     <ScreenContainer isPadding={0}>
       <StatusBar barStyle={'dark-content'} backgroundColor="#fff" />
       <View>
-        <Text>Второй Экран</Text>
+        <Text>Второй Экран Не понятно что требовалось </Text>
       </View>
     </ScreenContainer>
   );
